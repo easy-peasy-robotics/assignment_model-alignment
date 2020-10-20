@@ -1,0 +1,44 @@
+<application>
+
+  <name>Assignment on Alignment App icubSim</name>
+
+  <dependencies>
+      <port>/yarplogger</port>
+      <port>/icubSim/cam/left/rgbImage:o</port>
+      <port>/icubSim/cam/right/rgbImage:o</port>
+      <port>/icubSim/cam/left/depthImage:o</port>
+      <port>/icubSim/head/state:o</port>
+      <port>/iKinGazeCtrl/rpc</port>
+  </dependencies>
+
+  <module>
+      <name>assignment_alignment</name>
+      <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+      <node>localhost</node>
+  </module>
+
+  <module>
+      <name>yarpview</name>
+      <parameters>--name /viewer --x 10 --y 10 --compact</parameters>
+      <node>localhost</node>
+  </module>
+
+  <connection>
+      <from>/icubSim/cam/left/rgbImage:o</from>
+      <to>/viewer</to>
+      <protocol>unix_stream</protocol>
+  </connection>
+
+  <connection>
+      <from>/icubSim/cam/left/rgbImage:o</from>
+      <to>/alignment/rgb:i</to>
+      <protocol>unix_stream</protocol>
+  </connection>
+
+  <connection>
+      <from>/icubSim/cam/left/depthImage:o</from>
+      <to>/alignment/depth:i</to>
+      <protocol>unix_stream</protocol>
+  </connection>
+
+</application>

@@ -1,0 +1,69 @@
+<application>
+    <name>Fixture for Assignment on Alignment</name>
+    <description>A fixture to prepare components required for the assignment</description>
+    <version>1.0</version>
+    <authors>
+        <author email="vadim.tikhanoff@iit.it">Vadim Tikhanoff</author>
+        <author email="valentina.vasco@iit.it">Valentina Vasco</author>
+    </authors>
+
+  <module>
+      <name>gzserver</name>
+      <parameters>assignment-vision.sdf</parameters>
+      <node>testnode</node>
+  </module>
+
+  <module>
+      <name>gzclient</name>
+      <node>testnode</node>
+  </module>
+
+  <module>
+      <name>iKinGazeCtrl</name>
+      <parameters>--context gazeboCartesianControl --from iKinGazeCtrl.ini --torso off</parameters>
+      <dependencies>
+          <port timeout="20">/icubSim/head/state:o</port>
+          <port timeout="20">/icubSim/inertial</port>
+      </dependencies>
+      <ensure>
+          <wait>2</wait>
+      </ensure>
+      <node>testnode</node>
+  </module>
+
+ <module>
+      <name>assignment_alignment</name>
+        <dependencies>
+            <port timeout="10">/icubSim/head/state:o</port>
+            <port timeout="10">/icubSim/cam/left/depthImage:o</port>
+            <port timeout="10">/icubSim/cam/left/rgbImage:o</port>
+            <port timeout="10">/iKinGazeCtrl/rpc</port>
+        </dependencies>
+      <node>testnode</node>
+  </module>
+
+  <module>
+      <name>yarpview</name>
+      <parameters>--name /viewer --x 10 --y 10 --compact</parameters>
+      <node>testnode</node>
+  </module>
+
+  <connection>
+      <from>/icubSim/cam/left/rgbImage:o</from>
+      <to>/viewer</to>
+      <protocol>unix_stream</protocol>
+  </connection>
+
+  <connection>
+      <from>/icubSim/cam/left/rgbImage:o</from>
+      <to>/alignment/rgb:i</to>
+      <protocol>unix_stream</protocol>
+  </connection>
+
+  <connection>
+      <from>/icubSim/cam/left/depthImage:o</from>
+      <to>/alignment/depth:i</to>
+      <protocol>unix_stream</protocol>
+  </connection>
+
+</application>

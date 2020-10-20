@@ -1,0 +1,41 @@
+<application>
+
+  <name>Assignment on Alignment System</name>
+
+  <module>
+      <name>yarplogger</name>
+      <parameters>--start</parameters>
+      <node>localhost</node>
+  </module>
+
+  <module>
+      <name>gzserver</name>
+      <parameters>assignment-vision.sdf</parameters>
+      <dependencies>
+         <port timeout="20">/yarplogger</port>
+      </dependencies>
+      <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+      <node>localhost</node>
+  </module>
+
+  <module>
+      <name>gzclient</name>
+      <node>localhost</node>
+  </module>
+
+  <module>
+      <name>iKinGazeCtrl</name>
+      <parameters>--context gazeboCartesianControl --from iKinGazeCtrl.ini --torso off</parameters>
+      <dependencies>
+          <port timeout="20">/yarplogger</port>
+          <port timeout="20">/icubSim/head/state:o</port>
+          <port timeout="20">/icubSim/inertial</port>
+      </dependencies>
+      <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+      <ensure>
+          <wait>2</wait>
+      </ensure>
+      <node>localhost</node>
+  </module>
+
+</application>
