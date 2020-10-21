@@ -45,6 +45,9 @@
   <module>
       <name>yarpview</name>
       <parameters>--name /viewer --x 10 --y 10 --compact</parameters>
+      <dependencies>
+          <port timeout="10">/model-alignment/rpc</port>
+      </dependencies>
       <node>testnode</node>
   </module>
 

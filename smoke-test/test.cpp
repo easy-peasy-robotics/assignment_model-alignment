@@ -65,7 +65,7 @@ public:
         yarp::os::ResourceFinder rf;
         rf.setDefaultContext("model-alignment");
 
-        double score{0.0};
+        unsigned int score{0};
         {
             Bottle cmd, rep;
             cmd.addString("home");
@@ -83,7 +83,7 @@ public:
                 if (rep.get(0).asVocab() == Vocab::encode("ok"))
                 {
                     ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Loaded model correctly"));
-                    score+=5.0;
+                    score+=5;
                 }
                 else
                 {
@@ -102,7 +102,7 @@ public:
         unsigned int max_iterations{2000};
         const double transf_epsilon{1e-8};
         const double fitness_epsilon{1e-9};
-        double tmp{0.0};
+        unsigned int response_perc{0};
         for (int attempt = 1; attempt <= 5; attempt++) {
             ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Starting attempt #%d...", attempt));
             double response_score;
@@ -140,17 +140,15 @@ public:
                             double result = fabs(response_score - optimal);
                             if (result <= high)
                             {
-                                tmp+=20.0;
+                                response_perc++;
                                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done aligning"));
                             }
                             if (result > high && result <= low)
                             {
-                                tmp+=10.0;
                                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Almost there with alignment..."));
                             }
                             if (result > low)
                             {
-                                tmp+=0.0;
                                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Epic failure while aligning"));
                             }
                         }
@@ -170,8 +168,20 @@ public:
             Time::delay(2.0);
         }
 
-        tmp/=5.0;
-        score+=tmp;
+        response_perc/=5;
+        response_perc*=100;
+        if (response_perc <= 33)
+        {
+            score+=0;
+        }
+        if (response_perc > 33 && response_perc <=66)
+        {
+            score+=10;
+        }
+        if (response_perc > 66)
+        {
+            score+=20;
+        }
 
         {
             std::vector<double> response_params;
@@ -193,50 +203,50 @@ public:
 
             if (fabs(response_params[0] - max_distance) < 1.0)
             {
-                score+=2.0;
+                score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting maximum correspondence distance"));
             }
             else
             {
-                score+=0.0;
-                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format(""));
+                score+=0;
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Try to play with maximum correspondence distance"));
             }
 
             if (fabs(response_params[1] - max_iterations) < 1000)
             {
-                score+=2.0;
+                score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting maximum number of iterations"));
             }
             else
             {
-                score+=0.0;
-                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format(""));
+                score+=0;
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Try to play with maximum number of iterations"));
             }
 
             if (fabs(response_params[2] - transf_epsilon) < 1e-8)
             {
-                score+=2.0;
+                score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting the transformation epsilon"));
             }
             else
             {
-                score+=0.0;
-                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format(""));
+                score+=0;
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Try to play with transformation epsilon"));
             }
 
             if (fabs(response_params[3] - fitness_epsilon) < 1e-9)
             {
-                score+=2.0;
+                score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting the euclidean distance difference epsilon"));
             }
             else
             {
-                score+=0.0;
-                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format(""));
+                score+=0;
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Try to play with euclidean distance difference epsilon"));
             }
         }
 
-        ROBOTTESTINGFRAMEWORK_TEST_CHECK(score > 15.0, Asserter::format("Total score = %f", score));
+        ROBOTTESTINGFRAMEWORK_TEST_CHECK(score > 15, Asserter::format("Total score = %d", score));
     }
 };
 
