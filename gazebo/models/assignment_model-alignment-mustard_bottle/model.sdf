@@ -27,7 +27,7 @@
         <max_contacts>1</max_contacts>
         <geometry>
           <mesh>
-            <uri>model://mustard_bottle/meshes/obj_000005_collision.dae</uri>
+            <uri>model://assignment_model-alignment-mustard_bottle/meshes/obj_000005_collision.dae</uri>
           </mesh>
         </geometry>
       </collision>
@@ -35,7 +35,7 @@
       <visual name='mustard_bottle_visual'>>
         <geometry>
           <mesh>
-            <uri>model://mustard_bottle/meshes/obj_000005.dae</uri>
+            <uri>model://assignment_model-alignment-mustard_bottle/meshes/obj_000005.dae</uri>
           </mesh>
         </geometry>
       </visual>
