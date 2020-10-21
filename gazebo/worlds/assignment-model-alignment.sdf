@@ -36,20 +36,20 @@
     </include>
 
     <include>
-      <uri>model://table</uri>
+      <uri>model://assignment_model-alignment-table</uri>
       <pose>-0.530772 0 0.1 0 0 -1.57</pose>
     </include>
 
     <include>
-      <uri>model://mustard_bottle</uri>
+      <uri>model://assignment_model-alignment-mustard_bottle</uri>
       <plugin name="pose_mover" filename='libmodel-alignment-world.so'/>
       <pose>-0.264818 -0.002957 0.61 0 0 -1.90068</pose>
       <static>true</static>
     </include>
 
-    <model name="icub_head_epr">
+    <model name="assignment_model-alignment-icub_head_epr">
       <include>
-        <uri>model://icub_head_epr</uri>
+        <uri>model://assignment_model-alignment-icub_head_epr</uri>
         <pose>0.0 0.0 0.63 0.0 0.0 0.0</pose>
       </include>
     </model>

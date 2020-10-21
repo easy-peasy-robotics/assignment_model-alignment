@@ -3,7 +3,7 @@
 
 <sdf version="1.7">
 
-  <model name='mustard_bottle'>
+  <model name='assignment_model-alignment-mustard_bottle'>
 
     <link name='mustard_bottle_link'>
 
