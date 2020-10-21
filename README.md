@@ -1,11 +1,11 @@
-# EPR Assignment on Alignment
+# EPR Assignment on Model Alignment
 
 ## :information_source: Intro
 
 Within this assignment you will let the iCub perform _3D model alignment_ within the `Gazebo` simulation environment.
 To this end, the robot stands in a world consisting of a table and an object (i.e. a mustard bottle from the YCB dataset) located on it:
 
-<p align="center"> <img src="assets/scenario.png" width="250"> </p>
+<p align="center"> <img src="assets/scenario.png" width="350"> </p>
 
 The 3D point cloud of the scene is acquired from the iCub cameras and processed in order to segment out the object from the table.
 Your objective is to load the mesh created during the CAD design course and use the `Iterative Closest Point (ICP)` to align it with the object point cloud.
@@ -38,12 +38,12 @@ Your tasks will be:
 The depth image is required to create the 3D point cloud.
 While developing your code, you are required to read it from a `BufferedPort<ImageOf<PixelFloat>>`.
 
-**Perform alignment**:
+**Perform model alignment**:
 
 In order to perform the alignment, we provide you with a set of services you can access by typing:
 
 ```
-yarp rpc /alignment/rpc
+yarp rpc /model-alignment/rpc
 ```
 
 You can rely on the following services:
@@ -60,7 +60,7 @@ You can rely on the following services:
 
 Once done, you can test your code in two ways:
 
-- **manually**: running the `yarpmanager` scripts provided within `app/scripts`. This will help you to interact with the code.
+- **manually**: running the `yarpmanager` scripts provided within [`app/scripts`](https://github.com/easy-peasy-robotics/solution_model-alignment/tree/master/app/scripts). This will help you to interact with the code.
 - **automatically**: running the script `test.sh` in the _smoke-test_ directory. This will give you an idea of how many points you might score.
 
 ## :heavy_check_mark: Expected output
@@ -68,7 +68,7 @@ Once done, you can test your code in two ways:
 At the end of your test, you should get the following output, with the model (red) aligned to the object point cloud (green):
 
 <p align="center">
-<img src="assets/rgb.png" width="250"> <img src="assets/viewer_fit.png" width="260">
+<img src="assets/smoke-test.gif" width="400">
 </p>
 
 **Note** :memo: : you can interact with the 3D viewer (zoom in, zoom out, rotate).
@@ -79,7 +79,7 @@ The test is considered fully passed if you are able to:
 
 1. _load_ the mesh model correctly and convert it to a point cloud;
 2. select the correct _set of parameters_ for `ICP`;
-3. get a reasonable _alignment score_.
+3. get a reasonable _alignment score_ over 5 attempts.
 
 The following is the score map:
 
@@ -89,3 +89,5 @@ The following is the score map:
 |      2        |    8   |
 |      3        |   20   |
 | **Maximum score** |   33   |
+
+**Note** :warning: : the points you will get for point 3 are averaged over the 5 attempts.
