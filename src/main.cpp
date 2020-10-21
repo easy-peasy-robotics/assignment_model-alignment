@@ -234,7 +234,7 @@ class FitModule : public RFModule, public rpc_IDL {
     /**************************************************************************/
     bool is_model_valid() override
     {
-        return load_model("mustard_bottle");
+        return load_model("assignment_model-alignment-mustard_bottle");
     }
 
     /**************************************************************************/
