@@ -97,7 +97,7 @@ class FitModule : public RFModule, public rpc_IDL {
     bool configure(ResourceFinder& rf) override
     {
         this->rf = rf;
-        const string name = "alignment";
+        const string name = "model-alignment";
 
         Property gaze_options;
         gaze_options.put("device", "gazecontrollerclient");

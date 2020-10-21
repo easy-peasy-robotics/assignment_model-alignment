@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<suite name="Test Assignment on Alignment">
-    <description>Testing the assignment on Alignment</description>
+<suite name="Test Assignment on Model Alignment">
+    <description>Testing the assignment on Model Alignment</description>
     <environment>--robotname icubSim</environment>
     <fixture param="--fixture fixture.xml"> yarpmanager </fixture>
 
-    <test type="dll"> TestAssignmentAlignment </test>
+    <test type="dll"> TestAssignmentModelAlignment </test>
 </suite>

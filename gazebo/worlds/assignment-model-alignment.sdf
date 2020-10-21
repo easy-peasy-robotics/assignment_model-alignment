@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.7">
   <world name="default">
-    
+
     <include>
       <uri>model://sun</uri>
     </include>
@@ -42,15 +42,10 @@
 
     <include>
       <uri>model://mustard_bottle</uri>
+      <plugin name="pose_mover" filename='libmodel-alignment-world.so'/>
       <pose>-0.264818 -0.002957 0.61 0 0 -1.90068</pose>
       <static>true</static>
     </include>
-
-    <!--<include>
-      <uri>model://fallback-3</uri>
-      <pose>-0.4 0.0 0.61 0 0 -1.24366</pose>
-      <static>true</static>
-    </include>-->
 
     <model name="icub_head_epr">
       <include>

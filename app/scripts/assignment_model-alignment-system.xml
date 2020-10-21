@@ -1,6 +1,6 @@
 <application>
 
-  <name>Assignment on Alignment System</name>
+  <name>Assignment on Model Alignment System</name>
 
   <module>
       <name>yarplogger</name>
@@ -10,7 +10,7 @@
 
   <module>
       <name>gzserver</name>
-      <parameters>assignment-vision.sdf</parameters>
+      <parameters>assignment-model-alignment.sdf</parameters>
       <dependencies>
          <port timeout="20">/yarplogger</port>
       </dependencies>

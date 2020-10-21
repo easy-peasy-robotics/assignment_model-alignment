@@ -6,7 +6,7 @@
 ################################################################################
 
 cmake_minimum_required(VERSION 3.12)
-project(alignment VERSION 1.0.0)
+project(model-alignment VERSION 1.0.0)
 
 find_package(YCM REQUIRED)
 find_package(ICUBcontrib REQUIRED)
@@ -25,4 +25,6 @@ add_subdirectory(gazebo)
 include(AddUninstallTarget)
 
 file(GLOB scripts ${CMAKE_SOURCE_DIR}/app/scripts/*.xml)
-yarp_install(FILES ${scripts} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
+file(GLOB conf ${CMAKE_SOURCE_DIR}/app/conf/*.ini)
+yarp_install(FILES ${scripts} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR}/${PROJECT_NAME})
+yarp_install(FILES ${conf} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${PROJECT_NAME})

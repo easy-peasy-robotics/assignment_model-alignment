@@ -1,5 +1,5 @@
 <application>
-    <name>Fixture for Assignment on Alignment</name>
+    <name>Fixture for Assignment on Model Alignment</name>
     <description>A fixture to prepare components required for the assignment</description>
     <version>1.0</version>
     <authors>
@@ -9,7 +9,7 @@
 
   <module>
       <name>gzserver</name>
-      <parameters>assignment-vision.sdf</parameters>
+      <parameters>assignment-model-alignment.sdf</parameters>
       <node>testnode</node>
   </module>
 
@@ -32,7 +32,7 @@
   </module>
 
  <module>
-      <name>assignment_alignment</name>
+      <name>assignment_model-alignment</name>
         <dependencies>
             <port timeout="10">/icubSim/head/state:o</port>
             <port timeout="10">/icubSim/cam/left/depthImage:o</port>
@@ -56,13 +56,13 @@
 
   <connection>
       <from>/icubSim/cam/left/rgbImage:o</from>
-      <to>/alignment/rgb:i</to>
+      <to>/model-alignment/rgb:i</to>
       <protocol>unix_stream</protocol>
   </connection>
 
   <connection>
       <from>/icubSim/cam/left/depthImage:o</from>
-      <to>/alignment/depth:i</to>
+      <to>/model-alignment/depth:i</to>
       <protocol>unix_stream</protocol>
   </connection>
 

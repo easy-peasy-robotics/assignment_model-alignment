@@ -13,9 +13,16 @@ if (VTK_VERSION VERSION_LESS "8.90.0")
   include(${VTK_USE_FILE})
 endif()
 find_package(Gazebo REQUIRED)
-find_package(OpenCV REQUIRED)
 find_package(PCL REQUIRED)
 
+# world
+add_library(${PROJECT_NAME}-world SHARED ${CMAKE_CURRENT_SOURCE_DIR}/world.cpp)
+target_compile_definitions(${PROJECT_NAME}-world PRIVATE _USE_MATH_DEFINES)
+target_include_directories(${PROJECT_NAME}-world PRIVATE ${GAZEBO_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME}-world PRIVATE ${GAZEBO_LIBRARIES} ${YARP_LIBRARIES})
+install(TARGETS ${PROJECT_NAME}-world LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shlib)
+
+# assignment
 yarp_add_idl(IDL_GEN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/rpc.thrift)
 add_executable(assignment_${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${IDL_GEN_FILES})
 target_include_directories(assignment_${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${GAZEBO_INCLUDE_DIRS})
