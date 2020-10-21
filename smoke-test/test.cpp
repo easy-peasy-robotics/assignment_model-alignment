@@ -44,8 +44,8 @@ public:
         }
 
         objectPort.open("/"+getName()+"/object:o");
-        if (!Network::connect(objectPort.getName(), "/mustard_bottle/mover:i")) {
-            ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to connect to /mustard_bottle/mover:i");
+        if (!Network::connect(objectPort.getName(), "/assignment_model-alignment-mustard_bottle/mover:i")) {
+            ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to connect to /assignment_model-alignment-mustard_bottle/mover:i");
         }
 
         return true;
