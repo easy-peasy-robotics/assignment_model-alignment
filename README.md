@@ -58,6 +58,17 @@ You can rely on the following services:
      2. use `ICP` to align the point clouds.
  - `get_score`: to retrieve the alignment score.
 
+ **Change object's position in the world**:
+
+ You can try out several object's positions and check how the final alignment is affected.
+ You will need to write the desired position as `x y z roll pitch yaw` onto a Yarp `BufferedPort<Bottle>` port, by typing;
+
+ ```
+ yarp write ... /assignment_model-alignment-mustard_bottle/mover:i
+ ```
+
+**Note** :memo: : the frame is defined with respect to the robot, with `x` pointing backward, `y` pointing to the right and `z` pointing up.
+
 Once done, you can test your code in two ways:
 
 - **manually**: running the `yarpmanager` scripts provided within [`app/scripts`](https://github.com/easy-peasy-robotics/solution_model-alignment/tree/master/app/scripts). This will help you to interact with the code.
