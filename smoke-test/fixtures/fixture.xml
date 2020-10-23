@@ -69,4 +69,10 @@
       <protocol>unix_stream</protocol>
   </connection>
 
+  <connection>
+      <from>/model-alignment/mover:o</from>
+      <to>/assignment_model-alignment-mustard_bottle/mover:i</to>
+      <protocol>unix_stream</protocol>
+  </connection>
+
 </application>

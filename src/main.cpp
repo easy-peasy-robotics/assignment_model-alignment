@@ -69,6 +69,7 @@ class FitModule : public RFModule, public rpc_IDL {
     RpcServer rpcPort;
     BufferedPort<ImageOf<PixelRgb>> rgbPort;
     BufferedPort<ImageOf<PixelFloat>> depthPort;
+    BufferedPort<Bottle> objectMoverPort;
 
     ImageOf<PixelFloat>* depthImage{nullptr};
 
@@ -112,6 +113,7 @@ class FitModule : public RFModule, public rpc_IDL {
 
         rgbPort.open("/"+name+"/rgb:i");
         depthPort.open("/"+name+"/depth:i");
+        objectMoverPort.open("/"+name+"/mover:o");
         rpcPort.open("/"+name+"/rpc");
         attach(rpcPort);
 
@@ -324,6 +326,34 @@ class FitModule : public RFModule, public rpc_IDL {
     }
 
     /**************************************************************************/
+    bool randomize() override {
+        random_device rnd_device;
+        mt19937 mersenne_engine(rnd_device());
+        if (objectMoverPort.getOutputCount() > 0) {
+            std::vector<double> starting_pos{-0.26, 0.0, 0.61, 0.0, 0.0, -1.90068};
+            uniform_real_distribution<double> dist_x(-0.02, 0.01);
+            uniform_real_distribution<double> dist_y(-0.02, 0.02);
+            uniform_real_distribution<double> dist_rot(-M_PI/8, M_PI/10);
+
+            Bottle pose;
+            auto x = dist_x(mersenne_engine);
+            auto y = dist_y(mersenne_engine);
+            auto rot = dist_rot(mersenne_engine);
+            pose.addDouble(starting_pos[0] + x);
+            pose.addDouble(starting_pos[1] + y);
+            pose.addDouble(starting_pos[2]);
+            pose.addDouble(starting_pos[3]);
+            pose.addDouble(starting_pos[4]);
+            pose.addDouble(starting_pos[5] + rot);
+            objectMoverPort.prepare() = pose;
+            objectMoverPort.writeStrict();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**************************************************************************/
     yarp::os::Bottle get_point_clouds() override
     {
         yarp::os::Bottle rep;
@@ -434,6 +464,7 @@ class FitModule : public RFModule, public rpc_IDL {
 
         rpcPort.close();
         depthPort.close();
+        objectMoverPort.close();
         rgbPort.close();
         gaze.close();
         return true;

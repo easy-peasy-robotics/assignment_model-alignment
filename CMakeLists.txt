@@ -25,6 +25,4 @@ add_subdirectory(gazebo)
 include(AddUninstallTarget)
 
 file(GLOB scripts ${CMAKE_SOURCE_DIR}/app/scripts/*.xml)
-file(GLOB conf ${CMAKE_SOURCE_DIR}/app/conf/*.ini)
 yarp_install(FILES ${scripts} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR}/${PROJECT_NAME})
-yarp_install(FILES ${conf} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/${PROJECT_NAME})

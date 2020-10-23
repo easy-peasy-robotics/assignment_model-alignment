@@ -75,10 +75,6 @@ public:
     /******************************************************************/
     void run() override
     {
-
-        yarp::os::ResourceFinder rf;
-        rf.setDefaultContext("model-alignment");
-
         unsigned int score{0};
         {
             Bottle cmd, rep;
@@ -110,97 +106,93 @@ public:
             }
         }
 
-        const double high{0.0001};
-        const double low{0.1};
+        const double low{0.0001};
+        const double high{0.1};
         const double max_distance{1.0};
         unsigned int max_iterations{2000};
         const double transf_epsilon{1e-8};
         const double fitness_epsilon{1e-9};
-        unsigned int response_perc{0};
+        double response_perc{0.0};
         for (int attempt = 1; attempt <= 5; attempt++) {
             ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Starting attempt #%d...", attempt));
             double response_score;
-
-            string path = rf.findFile("pose-" + to_string(attempt) + ".ini");
-            ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Evaluating %s...", path.c_str()));
-            std::fstream file(path, std::ios_base::in);
-            double x, y, z, r, p, yw, optimal;
-            file >> x >> y >> z >> r >> p >> yw >> optimal;
-
-            Bottle &bPose = objectPort.prepare();
-            bPose.clear();
-            bPose.addDouble(x);
-            bPose.addDouble(y);
-            bPose.addDouble(z);
-            bPose.addDouble(r);
-            bPose.addDouble(p);
-            bPose.addDouble(yw);
-            objectPort.writeStrict();
-            Time::delay(1.0);
-
             {
                 Bottle cmd, rep;
-                cmd.addString("align");
+                cmd.addString("randomize");
                 if (visionPort.write(cmd, rep))
                 {
                     if (rep.get(0).asVocab() == Vocab::encode("ok"))
                     {
+                        Time::delay(1.0);
                         cmd.clear();
                         rep.clear();
-                        cmd.addString("get_point_clouds");
+                        cmd.addString("align");
                         if (visionPort.write(cmd, rep))
                         {
-                            Bottle *b = rep.get(0).asList();
-                            Bottle *source = b->get(0).asList();
-                            Bottle *transformed = b->get(1).asList();
-                            yarp::sig::PointCloud<yarp::sig::DataXYZRGBA> pc_object, pc_transformed;
-                            pc_object.fromBottle(*source);
-                            pc_transformed.fromBottle(*transformed);
-                            yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(pc_object, *pc_object_pcl);
-                            yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(pc_transformed, *pc_transformed_pcl);
-                            response_score = computeScore(pc_transformed_pcl, pc_object_pcl);
-                            double result = fabs(response_score - optimal);
-                            if (result <= high)
+                            if (rep.get(0).asVocab() == Vocab::encode("ok"))
                             {
-                                response_perc++;
-                                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done aligning"));
-                            }
-                            if (result > high && result <= low)
-                            {
-                                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Almost there with alignment..."));
-                            }
-                            if (result > low)
-                            {
-                                ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Epic failure while aligning"));
+                                cmd.clear();
+                                rep.clear();
+                                cmd.addString("get_point_clouds");
+                                if (visionPort.write(cmd, rep))
+                                {
+                                    Bottle *b = rep.get(0).asList();
+                                    Bottle *source = b->get(0).asList();
+                                    Bottle *transformed = b->get(1).asList();
+                                    yarp::sig::PointCloud<yarp::sig::DataXYZRGBA> pc_object, pc_transformed;
+                                    pc_object.fromBottle(*source);
+                                    pc_transformed.fromBottle(*transformed);
+                                    yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(pc_object, *pc_object_pcl);
+                                    yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(pc_transformed, *pc_transformed_pcl);
+                                    response_score = computeScore(pc_transformed_pcl, pc_object_pcl);
+                                    double result = fabs(response_score - 0.00033);
+                                    if (result <= low)
+                                    {
+                                        response_perc++;
+                                        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done aligning"));
+                                    }
+                                    if (result > low && result <= high)
+                                    {
+                                        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Almost there with alignment..."));
+                                    }
+                                    if (result > high)
+                                    {
+                                        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Epic failure while aligning"));
+                                    }
+                                }
+                                else
+                                {
+                                    ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to talk to /model-alignment/rpc");
+                                }
                             }
                         }
                         else
                         {
                             ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to talk to /model-alignment/rpc");
-
                         }
                     }
+
+                    Time::delay(2.0);
                 }
                 else
                 {
                     ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to talk to /model-alignment/rpc");
                 }
             }
-
-            Time::delay(2.0);
         }
 
-        response_perc/=5;
-        response_perc*=100;
-        if (response_perc <= 33)
+        response_perc/=5.0;
+        response_perc*=100.0;
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Percentage of attempt with success: %f", response_perc));
+        if (response_perc <= 33.0)
         {
             score+=0;
         }
-        if (response_perc > 33 && response_perc <=66)
+        if (response_perc > 33.0 && response_perc <=66.0)
         {
             score+=10;
         }
-        if (response_perc > 66)
+        if (response_perc > 66.0)
         {
             score+=20;
         }

@@ -73,4 +73,10 @@ service rpc_IDL
    **/
    Bottle get_point_clouds()
 
+   /**
+   * Randomize object's position.
+   * @return true/false on success/failure.
+   **/
+   bool randomize()
+
 }
