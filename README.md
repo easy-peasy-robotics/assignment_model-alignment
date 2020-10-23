@@ -56,16 +56,17 @@ You can rely on the following services:
  - `fit`: to perform the alignment. While developing your code, you will have to fill this function in order to:
      1. set `ICP` parameters;
      2. use `ICP` to align the point clouds.
- - `get_score`: to retrieve the alignment score.
 
  **Change object's position in the world**:
 
- You can try out several object's positions and check how the final alignment is affected.
- You will need to write the desired position as `x y z roll pitch yaw` onto a Yarp `BufferedPort<Bottle>` port, by typing;
+ You can try out several object's positions and check how the final alignment is affected, using one of the following approaches:
 
- ```
- yarp write ... /assignment_model-alignment-mustard_bottle/mover:i
- ```
+ - update _randomly_ the object's position with the `randomize` service we provided;
+ - write a _desired position_ as `x y z roll pitch yaw` onto a Yarp `BufferedPort<Bottle>` port, by typing;
+
+     ```
+     yarp write ... /assignment_model-alignment-mustard_bottle/mover:i
+     ```
 
 **Note** :memo: : the frame is defined with respect to the robot, with `x` pointing backward, `y` pointing to the right and `z` pointing up.
 
