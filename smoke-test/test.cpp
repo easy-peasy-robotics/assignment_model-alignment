@@ -13,6 +13,14 @@
 
 #include <yarp/robottestingframework/TestCase.h>
 #include <yarp/os/all.h>
+#include <yarp/pcl/Pcl.h>
+
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/conversions.h>
+#include <pcl/common/transforms.h>
+#include <pcl/kdtree/kdtree_flann.h>
 
 using namespace std;
 using namespace robottestingframework;
@@ -23,6 +31,9 @@ class TestAssignmentModelAlignment : public yarp::robottestingframework::TestCas
 {
     RpcClient visionPort;
     BufferedPort<Bottle> objectPort;
+
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_object_pcl;
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_transformed_pcl;
 
 public:
     /******************************************************************/
@@ -47,6 +58,9 @@ public:
         if (!Network::connect(objectPort.getName(), "/assignment_model-alignment-mustard_bottle/mover:i")) {
             ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to connect to /assignment_model-alignment-mustard_bottle/mover:i");
         }
+
+        pc_object_pcl = make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();
+        pc_transformed_pcl = make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();
 
         return true;
     }
@@ -133,10 +147,18 @@ public:
                     {
                         cmd.clear();
                         rep.clear();
-                        cmd.addString("get_score");
+                        cmd.addString("get_point_clouds");
                         if (visionPort.write(cmd, rep))
                         {
-                            response_score = rep.get(0).asDouble();
+                            Bottle *b = rep.get(0).asList();
+                            Bottle *source = b->get(0).asList();
+                            Bottle *transformed = b->get(1).asList();
+                            yarp::sig::PointCloud<yarp::sig::DataXYZRGBA> pc_object, pc_transformed;
+                            pc_object.fromBottle(*source);
+                            pc_transformed.fromBottle(*transformed);
+                            yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(pc_object, *pc_object_pcl);
+                            yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(pc_transformed, *pc_transformed_pcl);
+                            response_score = computeScore(pc_transformed_pcl, pc_object_pcl);
                             double result = fabs(response_score - optimal);
                             if (result <= high)
                             {
@@ -247,6 +269,30 @@ public:
         }
 
         ROBOTTESTINGFRAMEWORK_TEST_CHECK(score > 15, Asserter::format("Total score = %d", score));
+    }
+
+    /**************************************************************************/
+    double computeScore(const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr transformed_cloud,
+                        const pcl::PointCloud<pcl::PointXYZRGBA>::Ptr input_cloud)
+    {
+        pcl::KdTreeFLANN<pcl::PointXYZRGBA> tree;
+        tree.setInputCloud(input_cloud);
+
+        double fitness_score = 0.0;
+        std::vector<int> nn_indices(1);
+        std::vector<float> nn_dists(1);
+        // For each point in the source dataset
+        int nr = 0;
+        for (size_t i = 0; i < transformed_cloud->points.size(); ++i) {
+            // Find the nearest neighbor
+            int nn = tree.nearestKSearch(transformed_cloud->points[i], 1, nn_indices, nn_dists);
+            fitness_score += nn_dists[0];
+            nr++;
+        }
+        if (nr > 0)
+            return (fitness_score / nr);
+        else
+            return (std::numeric_limits<double>::infinity());
     }
 };
 

@@ -8,6 +8,14 @@
 *
 * IDL Interface
 */
+
+struct Bottle
+{
+} (
+   yarp.name = "yarp::os::Bottle"
+   yarp.includefile="yarp/os/Bottle.h"
+  )
+
 service rpc_IDL
 {
    /**
@@ -57,12 +65,12 @@ service rpc_IDL
    * Get icp parameters.
    * @return icp parameters.
    **/
-   list<double> get_parameters()
-
+   list<double> get_parameters()   
+   
    /**
-   * Get fitting score.
-   * @return fitting score.
+   * Get the source and the transformed point cloud.
+   * @return Bottle containing source and transformed point cloud.
    **/
-   double get_score()
+   Bottle get_point_clouds()
 
 }

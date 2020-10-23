@@ -15,7 +15,8 @@ set(CMAKE_SHARED_MODULE_PREFIX "")
 
 # add the required cmake packages
 find_package(RobotTestingFramework 2.0.0 COMPONENTS DLL)
-find_package(YARP 3.3.0 REQUIRED COMPONENTS os robottestingframework)
+find_package(YARP 3.3.0 REQUIRED COMPONENTS os robottestingframework pcl)
+find_package(PCL REQUIRED)
 
 # add include directories
 include_directories(${CMAKE_SOURCE_DIR}
@@ -25,4 +26,4 @@ include_directories(${CMAKE_SOURCE_DIR}
 add_library(${PROJECT_NAME} MODULE test.cpp)
 
 # add required libraries
-target_link_libraries(${PROJECT_NAME} ${RobotTestingFramework_LIBRARIES} ${YARP_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${RobotTestingFramework_LIBRARIES} ${YARP_LIBRARIES} ${PCL_LIBRARIES})

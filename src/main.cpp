@@ -74,8 +74,10 @@ class FitModule : public RFModule, public rpc_IDL {
 
     shared_ptr<yarp::sig::PointCloud<DataXYZRGBA>> pc_scene{nullptr};
     shared_ptr<yarp::sig::PointCloud<DataXYZRGBA>> pc_table{nullptr};
-    shared_ptr<yarp::sig::PointCloud<DataXYZRGBA>> pc_object{nullptr};
-    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_model_pcl;
+    shared_ptr<yarp::sig::PointCloud<DataXYZRGBA>> pc_object{nullptr};    
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_model_pcl{nullptr};
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_object_pcl{nullptr};
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_transformed_pcl{nullptr};
 
     Matrix Teye;
     double table_height{numeric_limits<double>::quiet_NaN()};
@@ -114,6 +116,8 @@ class FitModule : public RFModule, public rpc_IDL {
         attach(rpcPort);
 
         pc_model_pcl = make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();
+        pc_object_pcl = make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();
+        pc_transformed_pcl = make_shared<pcl::PointCloud<pcl::PointXYZRGBA>>();
 
         viewer = make_unique<Viewer>(10, 370, 350, 350);
         viewer->start();
@@ -270,7 +274,6 @@ class FitModule : public RFModule, public rpc_IDL {
         }
 
         // Copy yarp object to pcl object
-        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_object_pcl(new pcl::PointCloud<pcl::PointXYZRGBA>);
         yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(*pc_object, *pc_object_pcl);
 
         // Rescale model by the correct size
@@ -306,9 +309,8 @@ class FitModule : public RFModule, public rpc_IDL {
         {
             // Transform the input dataset using the final transformation
             T = icp.getFinalTransformation().cast<double>();
-            pcl::PointCloud<pcl::PointXYZRGBA>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZRGBA> ());
-            pcl::transformPointCloud(*pc_model_pcl_scaled, *transformed_cloud, T.inverse().cast<float>());
-            score = computeScore(transformed_cloud, pc_object_pcl);
+            pcl::transformPointCloud(*pc_model_pcl_scaled, *pc_transformed_pcl, T.inverse().cast<float>());
+            score = computeScore(pc_transformed_pcl, pc_object_pcl);
             yInfo() << "ICP has converged with score" << score;
             std::vector<double> color{1.0, 0.0, 0.0};
             viewer->addModel(model_mesh, T.inverse(), color, scale);
@@ -322,9 +324,15 @@ class FitModule : public RFModule, public rpc_IDL {
     }
 
     /**************************************************************************/
-    double get_score() override
+    yarp::os::Bottle get_point_clouds() override
     {
-        return score;
+        yarp::os::Bottle rep;
+        rep.addList().read(pc_object->toBottle());
+        shared_ptr<yarp::sig::PointCloud<DataXYZRGBA>> pc_transformed{nullptr};
+        pc_transformed = make_shared<yarp::sig::PointCloud<DataXYZRGBA>>();
+        yarp::pcl::fromPCL<pcl::PointXYZRGBA, yarp::sig::DataXYZRGBA>(*pc_transformed_pcl, *pc_transformed);
+        rep.addList().read(pc_transformed->toBottle());
+        return rep;
     }
 
     /**************************************************************************/
