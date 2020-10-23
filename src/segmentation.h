@@ -26,51 +26,33 @@ namespace segmentation {
 class Segmentation {
 public:
     /**************************************************************************/
-    static double RANSAC(std::shared_ptr<yarp::sig::PointCloud<yarp::sig::DataXYZRGBA>> pc_scene,
+    static int RANSAC(std::shared_ptr<yarp::sig::PointCloud<yarp::sig::DataXYZRGBA>> pc_scene,
                          std::shared_ptr<yarp::sig::PointCloud<yarp::sig::DataXYZRGBA>> pc_table,
-                         std::shared_ptr<yarp::sig::PointCloud<yarp::sig::DataXYZRGBA>> pc_object,
-                         const int num_points = 100) {
+                         std::shared_ptr<yarp::sig::PointCloud<yarp::sig::DataXYZRGBA>> pc_object) {
 
-        // generate random indexes
-        std::random_device rnd_device;
-        std::mt19937 mersenne_engine(rnd_device());
-        std::uniform_int_distribution<int> dist(0, pc_scene->size() - 1);
-        auto gen = std::bind(dist, mersenne_engine);
-        std::vector<int> remap(num_points);
-        std::generate(std::begin(remap), std::end(remap), gen);
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr pc_scene_pcl(new pcl::PointCloud<pcl::PointXYZRGBA>);
+        yarp::pcl::toPCL<yarp::sig::DataXYZRGBA, pcl::PointXYZRGBA>(*pc_scene, *pc_scene_pcl);
 
-        // implement RANSAC
-        const auto threshold_1 = .01F; // [cm]
-        for (size_t i = 0; i < remap.size(); i++) {
-            auto& pi = (*pc_scene)(remap[i]);
-            auto h = 0.F;
-            size_t n = 0;
-            for (size_t j = 0; j < remap.size(); j++) {
-                const auto& pj = (*pc_scene)(remap[j]);
-                if (std::fabs(pj.z - pi.z) < threshold_1) {
-                    h += pj.z;
-                    n++;
-                }
-            }
-            h /= n;
+        std::vector<int> inliers;
+        pcl::SampleConsensusModelPlane<pcl::PointXYZRGBA>::Ptr model_plane(new pcl::SampleConsensusModelPlane<pcl::PointXYZRGBA> (pc_scene_pcl));
 
-            if (n > (remap.size() >> 1)) {
-                pc_table->clear();
-                pc_object->clear();
-                const auto threshold_2 = h + threshold_1;
-                for (size_t i = 0; i < pc_scene->size(); i++) {
-                    const auto& p = (*pc_scene)(i);
-                    if (p.z < threshold_2) {
-                        pc_table->push_back(p);
-                    } else {
-                        pc_object->push_back(p);
-                    }
-                }
-                return h;
+        // get the inliers
+        pcl::RandomSampleConsensus<pcl::PointXYZRGBA> ransac(model_plane);
+        ransac.setDistanceThreshold(.01);
+        ransac.computeModel();
+        ransac.getInliers(inliers);
+
+        // copy all inliers of the model computed to the table point cloud
+        for (size_t i = 0; i < pc_scene->size(); i++) {
+            const auto& p = (*pc_scene)(i);
+            if (std::find(inliers.begin(), inliers.end(), i) != inliers.end()) {
+                pc_table->push_back(p);
+            } else {
+                pc_object->push_back(p);
             }
         }
-
-        return std::numeric_limits<double>::quiet_NaN();
+        yInfo()<<"Segmented object with"<<pc_object->size()<<"points";
+        return inliers.size();
     }
 
     /**************************************************************************/

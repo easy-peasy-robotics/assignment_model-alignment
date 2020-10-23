@@ -46,6 +46,8 @@
 #include <pcl/common/transforms.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/common/pca.h>
+#include <pcl/sample_consensus/ransac.h>
+#include <pcl/sample_consensus/sac_model_plane.h>
 
 #include <gazebo/common/Plugin.hh>
 
@@ -215,19 +217,18 @@ class FitModule : public RFModule, public rpc_IDL {
         // segment out the table and the object
         pc_table = make_shared<yarp::sig::PointCloud<DataXYZRGBA>>();
         pc_object = make_shared<yarp::sig::PointCloud<DataXYZRGBA>>();
-        table_height = Segmentation::RANSAC(pc_scene, pc_table, pc_object);
-        if (isnan(table_height)) {
+        int inliers = Segmentation::RANSAC(pc_scene, pc_table, pc_object);
+        yInfo() << "Found" << inliers << "inliers";
+        if (inliers <= 0) {
             yError() << "Segmentation failed!";
             return false;
         }
 
         // update viewer
-        Vector cam_foc;
-        igaze->get3DPointOnPlane(0, {w/2., h/2.}, {0., 0., 1., -table_height}, cam_foc);
-        viewer->addTable({cam_foc[0], cam_foc[1], cam_foc[2]}, {0., 0., 1.});
+        viewer->addCamera({cam_x[0], cam_x[1], cam_x[2]},
+                          {cam_x[0] + Teye(0, 2), cam_x[1] + Teye(1, 2), cam_x[2] + Teye(2, 2)},
+                          {0., 0., 1.}, view_angle);
         viewer->addObject(pc_object);
-        viewer->addCamera({cam_x[0], cam_x[1], cam_x[2]}, {cam_foc[0], cam_foc[1], cam_foc[2]},
-        {0., 0., 1.}, view_angle);
 
         if (pc_object->size() > 0) {
             return true;
