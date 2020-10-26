@@ -84,7 +84,8 @@ public:
                 ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to talk to /model-alignment/rpc");
             }
         }
-
+        Time::delay(2.0);
+         
         {
             Bottle cmd, rep;
             cmd.addString("is_model_valid");

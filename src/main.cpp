@@ -332,20 +332,18 @@ class FitModule : public RFModule, public rpc_IDL {
         mt19937 mersenne_engine(rnd_device());
         if (objectMoverPort.getOutputCount() > 0) {
             std::vector<double> starting_pos{-0.26, 0.0, 0.61, 0.0, 0.0, -1.90068};
-            uniform_real_distribution<double> dist_x(-0.02, 0.01);
-            uniform_real_distribution<double> dist_y(-0.02, 0.02);
-            uniform_real_distribution<double> dist_rot(-M_PI/8, M_PI/10);
+            uniform_real_distribution<double> dist_x(-0.03, 0.0);
+            uniform_real_distribution<double> dist_y(-0.08, 0.0);
 
             Bottle pose;
             auto x = dist_x(mersenne_engine);
             auto y = dist_y(mersenne_engine);
-            auto rot = dist_rot(mersenne_engine);
             pose.addDouble(starting_pos[0] + x);
             pose.addDouble(starting_pos[1] + y);
             pose.addDouble(starting_pos[2]);
             pose.addDouble(starting_pos[3]);
             pose.addDouble(starting_pos[4]);
-            pose.addDouble(starting_pos[5] + rot);
+            pose.addDouble(starting_pos[5]);
             objectMoverPort.prepare() = pose;
             objectMoverPort.writeStrict();
             return true;
