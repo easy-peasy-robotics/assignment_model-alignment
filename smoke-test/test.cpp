@@ -109,7 +109,7 @@ public:
 
         const double low{0.0001};
         const double high{0.1};
-        const double max_distance{1.0};
+        const double min_distance{0.3};
         unsigned int max_iterations{2000};
         const double transf_epsilon{1e-8};
         const double fitness_epsilon{1e-9};
@@ -216,7 +216,7 @@ public:
                 ROBOTTESTINGFRAMEWORK_ASSERT_FAIL("Unable to talk to /model-alignment/rpc");
             }
 
-            if (fabs(response_params[0] - max_distance) < 1.0)
+            if ((response_params[0] - min_distance) >= 0.0)
             {
                 score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting maximum correspondence distance"));
