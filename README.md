@@ -50,7 +50,7 @@ You can rely on the following services:
 
  - `home`: to let the iCub gaze at the object;
  - `segment`: to segment out the object point cloud from the table;
- - `load_model mustard_bottle`: to load the mesh model. While developing your code, you will have to fill this function in order to:
+ - `load_model assignment_model-alignment-mustard_bottle`: to load the mesh model. While developing your code, you will have to fill this function in order to:
      1. load the `STL` mesh of the object;
      2. convert it to a 3D point cloud.
  - `fit`: to perform the alignment. While developing your code, you will have to fill this function in order to:
