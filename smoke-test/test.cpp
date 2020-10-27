@@ -110,9 +110,9 @@ public:
         const double low{0.0001};
         const double high{0.1};
         const double min_distance{0.3};
-        unsigned int max_iterations{2000};
-        const double transf_epsilon{1e-8};
-        const double fitness_epsilon{1e-9};
+        unsigned int min_iterations{100};
+        const double max_transf_epsilon{0.00000001};
+        const double max_fitness_epsilon{0.0001};
         double response_perc{0.0};
         for (int attempt = 1; attempt <= 5; attempt++) {
             ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Starting attempt #%d...", attempt));
@@ -227,7 +227,7 @@ public:
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Try to play with maximum correspondence distance"));
             }
 
-            if (fabs(response_params[1] - max_iterations) < 1000)
+            if ((response_params[1] - min_iterations) >= 0)
             {
                 score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting maximum number of iterations"));
@@ -238,7 +238,7 @@ public:
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Try to play with maximum number of iterations"));
             }
 
-            if (fabs(response_params[2] - transf_epsilon) < 1e-8)
+            if ((max_transf_epsilon - response_params[2]) >= 0.0)
             {
                 score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting the transformation epsilon"));
@@ -249,7 +249,7 @@ public:
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Try to play with transformation epsilon"));
             }
 
-            if (fabs(response_params[3] - fitness_epsilon) < 1e-9)
+            if ((max_fitness_epsilon - response_params[3]) >= 0.0)
             {
                 score+=2;
                 ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Well done setting the euclidean distance difference epsilon"));
