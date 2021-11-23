@@ -30,12 +30,12 @@ class ModelMover : public gazebo::ModelPlugin
     void onWorldFrame() {
         if (auto* b = port.read(false)) {
             if (b->size() >= 6) {
-                const auto x = b->get(0).asDouble();
-                const auto y = b->get(1).asDouble();
-                const auto z = b->get(2).asDouble();
-                const auto r = b->get(3).asDouble();
-                const auto p = b->get(4).asDouble();
-                const auto yw = b->get(5).asDouble();
+                const auto x = b->get(0).asFloat64();
+                const auto y = b->get(1).asFloat64();
+                const auto z = b->get(2).asFloat64();
+                const auto r = b->get(3).asFloat64();
+                const auto p = b->get(4).asFloat64();
+                const auto yw = b->get(5).asFloat64();
                 ignition::math::Pose3d pose(x, y, z, r, p, yw);
                 model->SetWorldPose(pose);
             }

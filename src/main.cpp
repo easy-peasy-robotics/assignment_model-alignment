@@ -185,7 +185,7 @@ class FitModule : public RFModule, public rpc_IDL {
         // get camera intrinsics
         Bottle info;
         igaze->getInfo(info);
-        const auto fov_h = info.find("camera_intrinsics_left").asList()->get(0).asDouble();
+        const auto fov_h = info.find("camera_intrinsics_left").asList()->get(0).asFloat64();
         const auto view_angle = 2. * std::atan((w / 2.) / fov_h) * (180. / M_PI);
 
         // aggregate image data in the point cloud of the whole scene
@@ -338,12 +338,12 @@ class FitModule : public RFModule, public rpc_IDL {
             Bottle pose;
             auto x = dist_x(mersenne_engine);
             auto y = dist_y(mersenne_engine);
-            pose.addDouble(starting_pos[0] + x);
-            pose.addDouble(starting_pos[1] + y);
-            pose.addDouble(starting_pos[2]);
-            pose.addDouble(starting_pos[3]);
-            pose.addDouble(starting_pos[4]);
-            pose.addDouble(starting_pos[5]);
+            pose.addFloat64(starting_pos[0] + x);
+            pose.addFloat64(starting_pos[1] + y);
+            pose.addFloat64(starting_pos[2]);
+            pose.addFloat64(starting_pos[3]);
+            pose.addFloat64(starting_pos[4]);
+            pose.addFloat64(starting_pos[5]);
             objectMoverPort.prepare() = pose;
             objectMoverPort.writeStrict();
             return true;

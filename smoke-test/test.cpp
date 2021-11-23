@@ -46,7 +46,7 @@ public:
     /******************************************************************/
     bool setup(Property& property) override
     {
-        float rpcTmo=(float)property.check("rpc-timeout",Value(120.0)).asDouble();
+        float rpcTmo=(float)property.check("rpc-timeout",Value(120.0)).asFloat64();
 
         visionPort.open("/"+getName()+"/vision:rpc");
         visionPort.asPort().setTimeout(rpcTmo);
@@ -91,7 +91,7 @@ public:
             cmd.addString("is_model_valid");
             if (visionPort.write(cmd, rep))
             {
-                if (rep.get(0).asVocab() == Vocab::encode("ok"))
+                if (rep.get(0).asVocab32() == Vocab32::encode("ok"))
                 {
                     ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Loaded model correctly"));
                     score+=5;
@@ -122,7 +122,7 @@ public:
                 cmd.addString("randomize");
                 if (visionPort.write(cmd, rep))
                 {
-                    if (rep.get(0).asVocab() == Vocab::encode("ok"))
+                    if (rep.get(0).asVocab32() == Vocab32::encode("ok"))
                     {
                         Time::delay(1.0);
                         cmd.clear();
@@ -130,7 +130,7 @@ public:
                         cmd.addString("align");
                         if (visionPort.write(cmd, rep))
                         {
-                            if (rep.get(0).asVocab() == Vocab::encode("ok"))
+                            if (rep.get(0).asVocab32() == Vocab32::encode("ok"))
                             {
                                 cmd.clear();
                                 rep.clear();
@@ -206,10 +206,10 @@ public:
             if (visionPort.write(cmd, rep))
             {
                 Bottle *reply = rep.get(0).asList();
-                response_params[0] = reply->get(0).asDouble();
-                response_params[1] = reply->get(1).asDouble();
-                response_params[2] = reply->get(2).asDouble();
-                response_params[3] = reply->get(3).asDouble();
+                response_params[0] = reply->get(0).asFloat64();
+                response_params[1] = reply->get(1).asFloat64();
+                response_params[2] = reply->get(2).asFloat64();
+                response_params[3] = reply->get(3).asFloat64();
             }
             else
             {
